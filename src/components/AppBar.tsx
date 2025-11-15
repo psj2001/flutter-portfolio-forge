@@ -2,10 +2,14 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import { useProfileData } from "@/hooks/usePortfolioData";
 
 const AppBar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: profileData } = useProfileData();
+  
+  const displayName = profileData?.name || "Portfolio";
 
   const navItems = [
     { path: "/", label: "Home" },
@@ -26,7 +30,7 @@ const AppBar = () => {
             whileHover={{ scale: 1.02 }}
             className="text-xl font-semibold tracking-tight text-foreground"
           >
-            Pranav P S
+            {displayName}
           </motion.h1>
         </Link>
 

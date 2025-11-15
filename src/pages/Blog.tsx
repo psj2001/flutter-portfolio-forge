@@ -1,10 +1,19 @@
 import { motion } from "framer-motion";
 import MaterialCard from "@/components/MaterialCard";
 import { Calendar, Clock } from "lucide-react";
+import { useBlogPosts } from "@/hooks/usePortfolioData";
 
 const Blog = () => {
-  // Placeholder blog posts - will be replaced with Firebase data
-  const posts = [
+  const { data: posts = [], isLoading, error } = useBlogPosts(true);
+
+  // Debug: Log posts to console
+  if (error) {
+    console.error("Blog posts error:", error);
+  }
+  console.log("Blog posts from Firebase:", posts);
+
+  // Fallback posts if Firebase is not configured
+  const defaultPosts = [
     {
       id: "1",
       title: "Building Scalable Flutter Apps with Clean Architecture",
@@ -34,6 +43,8 @@ const Blog = () => {
     },
   ];
 
+  const displayPosts = posts.length > 0 ? posts : defaultPosts;
+
   return (
     <div className="min-h-screen bg-background py-20">
       <div className="container mx-auto px-6">
@@ -49,8 +60,32 @@ const Blog = () => {
           </p>
         </motion.div>
 
+        {isLoading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading blog posts...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-12">
+            <p className="text-red-500">Error loading blog posts. Check console for details.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Make sure blog posts are published in Firestore with `published: true`
+            </p>
+          </div>
+        )}
+
+        {!isLoading && !error && posts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No blog posts found.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Add blog posts in Firestore: portfolio → blog → posts subcollection
+            </p>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post, index) => (
+          {displayPosts.map((post, index) => (
             <motion.a
               key={post.id}
               href={`/blog/${post.id}`}

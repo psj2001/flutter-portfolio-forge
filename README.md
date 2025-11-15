@@ -59,6 +59,38 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Firebase (Firestore) - For dynamic content management
+
+## Firebase Integration
+
+This portfolio website is integrated with Firebase Firestore, allowing you to manage all content (profile, projects, blog posts, etc.) dynamically from Firebase Console.
+
+### Quick Setup
+
+1. **Create a Firebase project** at [Firebase Console](https://console.firebase.google.com/)
+2. **Enable Firestore Database** in your Firebase project
+3. **Get your Firebase config** from Project Settings > General
+4. **Create a `.env` file** in the root directory with your Firebase credentials:
+   ```
+   VITE_FIREBASE_API_KEY=your-api-key
+   VITE_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project-id
+   VITE_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+   VITE_FIREBASE_APP_ID=your-app-id
+   ```
+5. **Set up Firestore data structure** - See [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for detailed instructions
+
+### Managing Content
+
+Once set up, you can manage all your portfolio content directly from Firebase Console:
+- **Profile**: Name, title, bio, profile photo
+- **Home**: Hero section, skills, CTA
+- **About**: Introduction, experience, skills, social links
+- **Projects**: Project listings with details
+- **Blog**: Blog posts with metadata
+
+For detailed setup instructions, see [FIREBASE_SETUP.md](./FIREBASE_SETUP.md).
 
 ## How can I deploy this project?
 

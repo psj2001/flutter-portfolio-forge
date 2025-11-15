@@ -2,9 +2,13 @@ import { motion } from "framer-motion";
 import MaterialCard from "@/components/MaterialCard";
 import FlutterButton from "@/components/FlutterButton";
 import { ExternalLink, Github } from "lucide-react";
+import { useProjects } from "@/hooks/usePortfolioData";
 
 const Projects = () => {
-  const projects = [
+  const { data: projects = [], isLoading } = useProjects();
+
+  // Fallback projects if Firebase is not configured
+  const defaultProjects = [
     {
       name: "PropTelli (Casakey)",
       description: "Real estate management platform with property listings, virtual tours, and transaction management.",
@@ -49,6 +53,8 @@ const Projects = () => {
     },
   ];
 
+  const displayProjects = projects.length > 0 ? projects : defaultProjects;
+
   return (
     <div className="min-h-screen bg-background py-20">
       <div className="container mx-auto px-6">
@@ -65,8 +71,14 @@ const Projects = () => {
           </p>
         </motion.div>
 
+        {isLoading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
+          {displayProjects.map((project, index) => (
             <motion.div
               key={project.name}
               initial={{ opacity: 0, y: 20 }}

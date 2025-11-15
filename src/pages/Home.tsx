@@ -1,33 +1,77 @@
 import { motion } from "framer-motion";
 import MaterialCard from "@/components/MaterialCard";
 import FlutterButton from "@/components/FlutterButton";
-import { Code2, Database, Cloud, Smartphone } from "lucide-react";
+import { Code2, Database, Cloud, Smartphone, LucideIcon } from "lucide-react";
 import heroBackground from "@/assets/hero-bg.jpg";
-import appMockup from "@/assets/app-mockup.png";
+import { useHomeData } from "@/hooks/usePortfolioData";
+import { useMemo } from "react";
+
+// Icon mapping for skills
+const iconMap: Record<string, LucideIcon> = {
+  smartphone: Smartphone,
+  database: Database,
+  cloud: Cloud,
+  code2: Code2,
+  // Add more icon mappings as needed
+};
+
+// Default placeholder photo
+const defaultProfilePhoto = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='400'%3E%3Crect fill='%23f0f0f0' width='320' height='400'/%3E%3Ctext x='50%25' y='45%25' text-anchor='middle' fill='%23ccc' font-family='Arial' font-size='14'%3EAdd profile photo%3C/text%3E%3C/svg%3E";
 
 const Home = () => {
-  const skills = [
-    {
-      icon: <Smartphone className="w-8 h-8 text-primary" />,
-      title: "Flutter Cross-Platform",
-      description: "Building beautiful, native-quality apps for iOS and Android from a single codebase.",
-    },
-    {
-      icon: <Database className="w-8 h-8 text-primary" />,
-      title: "Firebase Integration",
-      description: "Real-time databases, authentication, cloud storage, and serverless functions.",
-    },
-    {
-      icon: <Cloud className="w-8 h-8 text-primary" />,
-      title: "GraphQL APIs",
-      description: "Efficient data fetching and state management with modern API architecture.",
-    },
-    {
-      icon: <Code2 className="w-8 h-8 text-primary" />,
-      title: "App Store Deployment",
-      description: "Complete CI/CD pipeline setup and successful launches on both app stores.",
-    },
-  ];
+  const { data: homeData, isLoading, error } = useHomeData();
+
+  // Get icon component from string
+  const getIcon = (iconName?: string) => {
+    if (!iconName) return <Code2 className="w-8 h-8 text-primary" />;
+    const IconComponent = iconMap[iconName.toLowerCase()];
+    return IconComponent ? (
+      <IconComponent className="w-8 h-8 text-primary" />
+    ) : (
+      <Code2 className="w-8 h-8 text-primary" />
+    );
+  };
+
+  const profile = homeData?.profile || {
+    name: "",
+    title: "Flutter Developer",
+    subtitle: "Building cross-platform mobile experiences with Flutter, Firebase, and modern app architecture",
+    profilePhoto: defaultProfilePhoto,
+  };
+
+  const skills = useMemo(() => {
+    if (!homeData?.skills || homeData.skills.length === 0) {
+      // Fallback default skills
+      return [
+        {
+          icon: <Smartphone className="w-8 h-8 text-primary" />,
+          title: "Flutter Cross-Platform",
+          description: "Building beautiful, native-quality apps for iOS and Android from a single codebase.",
+        },
+        {
+          icon: <Database className="w-8 h-8 text-primary" />,
+          title: "Firebase Integration",
+          description: "Real-time databases, authentication, cloud storage, and serverless functions.",
+        },
+        {
+          icon: <Cloud className="w-8 h-8 text-primary" />,
+          title: "GraphQL APIs",
+          description: "Efficient data fetching and state management with modern API architecture.",
+        },
+        {
+          icon: <Code2 className="w-8 h-8 text-primary" />,
+          title: "App Store Deployment",
+          description: "Complete CI/CD pipeline setup and successful launches on both app stores.",
+        },
+      ];
+    }
+    return homeData.skills.map((skill) => ({
+      ...skill,
+      icon: getIcon(skill.icon),
+    }));
+  }, [homeData?.skills]);
+
+  const profilePhoto = profile.profilePhoto || defaultProfilePhoto;
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,10 +94,10 @@ const Home = () => {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4">
-                Flutter Developer
+                {isLoading ? "Loading..." : profile.title || "Flutter Developer"}
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
-                Building cross-platform mobile experiences with Flutter, Firebase, and modern app architecture
+                {isLoading ? "Loading..." : profile.subtitle || "Building cross-platform mobile experiences"}
               </p>
               <div className="flex gap-4">
                 <FlutterButton onClick={() => window.location.href = '/projects'}>
@@ -69,13 +113,20 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="hidden md:flex justify-center"
+              className="hidden md:flex justify-center items-center"
             >
-              <img 
-                src={appMockup} 
-                alt="App Mockup" 
-                className="w-64 h-auto drop-shadow-2xl"
-              />
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-3xl" />
+                <img 
+                  src={profilePhoto} 
+                  alt={profile.name || "Profile"} 
+                  className="relative w-80 h-auto rounded-2xl object-cover drop-shadow-2xl"
+                  style={{
+                    mixBlendMode: 'normal',
+                    filter: 'contrast(1.05) brightness(1.02)',
+                  }}
+                />
+              </div>
             </motion.div>
           </div>
         </div>
@@ -127,10 +178,10 @@ const Home = () => {
             transition={{ duration: 0.5 }}
           >
             <h2 className="text-3xl font-bold text-primary-onContainer mb-4">
-              Let's Build Something Amazing
+              {homeData?.ctaTitle || "Let's Build Something Amazing"}
             </h2>
             <p className="text-lg text-primary-onContainer/80 mb-8 max-w-2xl mx-auto">
-              Available for freelance projects and full-time opportunities
+              {homeData?.ctaDescription || "Available for freelance projects and full-time opportunities"}
             </p>
             <FlutterButton onClick={() => window.location.href = '/about'}>
               Get In Touch
