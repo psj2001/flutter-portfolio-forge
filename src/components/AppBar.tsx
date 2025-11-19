@@ -1,15 +1,52 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Menu, Moon, Sun } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useProfileData } from "@/hooks/usePortfolioData";
+import { useTheme } from "@/components/ThemeProvider";
+import { Button } from "@/components/ui/button";
 
 const AppBar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: profileData } = useProfileData();
+  const { theme, setTheme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
   
   const displayName = profileData?.name || "Portfolio";
+  
+  useEffect(() => {
+    const updateDarkMode = () => {
+      if (theme === "dark") {
+        setIsDark(true);
+      } else if (theme === "light") {
+        setIsDark(false);
+      } else {
+        // System theme
+        setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
+      }
+    };
+    
+    updateDarkMode();
+    
+    if (theme === "system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      mediaQuery.addEventListener("change", updateDarkMode);
+      return () => mediaQuery.removeEventListener("change", updateDarkMode);
+    }
+  }, [theme]);
+  
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+    } else if (theme === "dark") {
+      setTheme("light");
+    } else {
+      // If system, toggle to opposite of current system preference
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      setTheme(systemTheme === "dark" ? "light" : "dark");
+    }
+  };
 
   const navItems = [
     { path: "/", label: "Home" },
@@ -57,15 +94,42 @@ const AppBar = () => {
               </Link>
             );
           })}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="ml-4"
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
         </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-foreground"
-        >
-          <Menu size={24} />
-        </button>
+        {/* Mobile Menu Button and Theme Toggle */}
+        <div className="md:hidden flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-foreground"
+          >
+            <Menu size={24} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}

@@ -115,15 +115,16 @@ const Home = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="hidden md:flex justify-center items-center"
             >
-              <div className="relative">
+              <div className="relative max-w-sm w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-3xl" />
                 <img 
                   src={profilePhoto} 
                   alt={profile.name || "Profile"} 
-                  className="relative w-80 h-auto rounded-2xl object-cover drop-shadow-2xl"
+                  className="relative w-full max-w-xs h-auto rounded-2xl object-cover drop-shadow-2xl"
                   style={{
                     mixBlendMode: 'normal',
                     filter: 'contrast(1.05) brightness(1.02)',
+                    maxHeight: '400px',
                   }}
                 />
               </div>

@@ -58,7 +58,13 @@ const About = () => {
         >
           <h1 className="text-5xl font-bold text-foreground mb-4">About Me</h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            {aboutLoading ? "Loading..." : profileData?.bio || "Flutter developer passionate about creating exceptional mobile experiences"}
+            {aboutLoading
+              ? "Loading..."
+              : (profileData?.bio && profileData.bio.trim() !== ""
+                  ? profileData.bio
+                  : (introduction.length > 0
+                      ? introduction[0]
+                      : "Flutter developer passionate about creating exceptional mobile experiences"))}
           </p>
         </motion.div>
 
@@ -94,10 +100,22 @@ const About = () => {
                     transition={{ delay: index * 0.1 }}
                     className="border-l-2 border-primary pl-6"
                   >
-                    <h3 className="text-lg font-semibold text-card-foreground">{exp.title}</h3>
-                    <p className="text-sm text-primary mb-1">{exp.company}</p>
-                    <p className="text-xs text-muted-foreground mb-2">{exp.period}</p>
-                    <p className="text-sm text-muted-foreground">{exp.description}</p>
+                    <div className="flex items-start gap-4">
+                      {exp.companyImage ? (
+                        <img
+                          src={exp.companyImage}
+                          alt={exp.company}
+                          className="w-12 h-12 rounded-md object-cover border"
+                          loading="lazy"
+                        />
+                      ) : null}
+                      <div>
+                        <h3 className="text-lg font-semibold text-card-foreground">{exp.title}</h3>
+                        <p className="text-sm text-primary mb-1">{exp.company}</p>
+                        <p className="text-xs text-muted-foreground mb-2">{exp.period}</p>
+                        <p className="text-sm text-muted-foreground">{exp.description}</p>
+                      </div>
+                    </div>
                   </motion.div>
                 ))}
               </div>

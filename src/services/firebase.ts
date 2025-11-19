@@ -6,6 +6,7 @@ import {
   query,
   where,
   orderBy,
+  addDoc,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -99,10 +100,15 @@ export const getAboutData = async (): Promise<AboutData | null> => {
     ]);
     
     const aboutData = aboutSnap.exists() ? aboutSnap.data() : {};
-    const experience = experienceSnap.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Experience[];
+    const experience = experienceSnap.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        // Map companyimg (Firebase) to companyImage (TypeScript)
+        companyImage: data.companyImage || data.companyimg || undefined,
+      };
+    }) as Experience[];
     
     return {
       introduction: aboutData.introduction || [],
@@ -220,6 +226,25 @@ export const getBlogPost = async (id: string): Promise<BlogPost | null> => {
     return null;
   } catch (error) {
     console.error("Error fetching blog post:", error);
+    return null;
+  }
+};
+
+// Create New Experience Entry
+export const createExperience = async (experience: Omit<Experience, "id">): Promise<string | null> => {
+  try {
+    const experienceRef = collection(db, "portfolio", "about", "experience");
+    const { companyImage, ...rest } = experience;
+    const docRef = await addDoc(experienceRef, {
+      ...rest,
+      // Store as companyimg to match Firebase field name (also store companyImage for compatibility)
+      companyimg: companyImage || "",
+      companyImage: companyImage || "",
+    });
+    console.log("Experience created with ID:", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating experience:", error);
     return null;
   }
 };

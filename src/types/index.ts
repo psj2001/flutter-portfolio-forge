@@ -21,6 +21,7 @@ export interface Experience {
   company: string;
   period: string;
   description: string;
+  companyImage?: string;
 }
 
 export interface Project {
@@ -76,5 +77,7 @@ export interface PortfolioData {
   projects: Project[];
   blog: BlogPost[];
 }
+
+
 
 

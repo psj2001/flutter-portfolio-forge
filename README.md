@@ -1,3 +1,225 @@
+## Flutter Photo Uploader & Editor (Blueprint)
+
+A production-ready blueprint for a Flutter app that lets users capture, import, edit, and upload photos with Firebase backend. Use this README as your master plan; we can refine and implement each section together.
+
+### Why this app
+- **Capture/Import**: Camera and gallery support with permissions.
+- **Edit**: Crop, rotate, flip, filters, basic adjustments.
+- **Upload**: Firebase Storage with progress, retries, and metadata in Firestore.
+- **Manage**: Gallery grid, detail view, edit/update, delete, share.
+- **Scale**: Secure rules, pagination, caching, offline-friendly, analytics.
+
+---
+
+## Screens and Flows
+
+### Primary Screens
+1) Auth Screen
+   - Google Sign-In or Email/Password.
+   - Redirects to Gallery after success.
+
+2) Gallery Grid (Home)
+   - User-scoped photos in a grid.
+   - Infinite scroll/pagination, pull-to-refresh.
+   - FAB: Upload (pick/import or camera).
+   - Empty state + helpful CTA.
+
+3) Capture/Import
+   - Camera capture or image picker (multi-select optional).
+   - Permission prompts with graceful fallback/explanations.
+
+4) Editor
+   - Crop (free, 1:1, 4:3, 16:9), rotate, flip.
+   - Filters (preset) and basic adjustments (brightness/contrast/saturation).
+   - Undo/redo and reset.
+   - Save as new or overwrite (configurable).
+
+5) Upload Progress
+   - Shows per-file progress, speed (optional), cancel/retry.
+   - Background-safe with queued tasks (resumes on app reopen).
+
+6) Photo Detail
+   - Fullscreen viewer with pinch-to-zoom.
+   - Actions: Edit, Share, Delete, Download (local).
+   - Metadata card (size, createdAt, edited, EXIF subset).
+
+7) Profile & Settings
+   - Account info, sign-out.
+   - Dark mode toggle, cache management (clear thumbnails).
+   - About/Privacy/Support links.
+
+8) Error/Empty/Permission States
+   - Friendly, actionable copy for network/offline, permissions denied, no results.
+
+### Optional (Phase 2)
+- Search & Filters (by date, tag).
+- Collections/Albums.
+- Batch actions (multi-select).
+- In-editor brush/markup, text overlays, stickers.
+
+---
+
+## Architecture
+
+- **State management**: Bloc
+- **Routing**: go_router
+- **Data**: Firebase Auth, Storage, Firestore
+- **Media**: image_picker, camera, photo_view
+- **Editing**: image_cropper or image_editor_plus
+- **Caching**: cached_network_image, local thumbnails
+- **Utilities**: connectivity_plus, path_provider, package_info_plus (optional)
+
+### Suggested Folder Structure (feature-first)
+```
+lib/
+  app/
+    app.dart
+    router.dart
+    theme.dart
+  features/
+    auth/
+      data/
+      domain/
+      presentation/
+    gallery/
+      data/
+      domain/
+      presentation/
+    editor/
+      data/
+      domain/
+      presentation/
+    photo_detail/
+      data/
+      domain/
+      presentation/
+    settings/
+      data/
+      domain/
+      presentation/
+  common/
+    widgets/
+    services/
+    utils/
+```
+
+---
+
+## Data Model (baseline)
+
+### Firestore
+- Collection: `users/{uid}/photos/{photoId}`
+```
+Photo {
+  id: string,
+  ownerUid: string,
+  storagePath: string,          // e.g., users/{uid}/photos/{photoId}.jpg
+  downloadUrl: string,          // Firebase Storage getDownloadURL
+  thumbnailUrl: string,         // optional: pre-generated thumbnail
+  width: int,
+  height: int,
+  sizeBytes: int,
+  createdAt: Timestamp,
+  updatedAt: Timestamp,
+  edited: bool,
+  exif: {
+    cameraModel?: string,
+    focalLength?: number
+  }
+}
+```
+
+### Storage
+- Path: `users/{uid}/photos/{photoId}.{ext}`
+- Optional thumbnails: `users/{uid}/thumbnails/{photoId}.jpg`
+
+---
+
+## Firebase Security Rules (starting point)
+
+### Firestore (`users/{uid}/photos/{photoId}`)
+- Read/Write only if `request.auth.uid == uid`
+- Validate fields (types, max sizes)
+- Server timestamps for created/updated
+
+### Storage (`users/{uid}/**`)
+- Read/Write only if the path `uid` matches `request.auth.uid`
+- Limit file size and mime type to images
+
+We can harden these rules as requirements evolve (e.g., rate limits, custom claims).
+
+---
+
+## Setup & Installation
+
+### Prerequisites
+- Flutter (stable) installed
+- Firebase project (Console)
+- Android/iOS dev setup (SDKs, Xcode for iOS)
+
+### Create project
+```
+flutter create photo_portfolio
+cd photo_portfolio
+```
+
+### Add dependencies
+```
+dart pub add firebase_core firebase_auth cloud_firestore firebase_storage
+dart pub add flutter_riverpod go_router image_picker camera photo_view cached_network_image
+dart pub add image_cropper
+dart pub add connectivity_plus path_provider
+dart pub add --dev flutter_lints
+```
+
+### Configure Firebase
+1) Create a Firebase project in the console.
+2) Add Android app (set package name), download `google-services.json`.
+3) Add iOS app (set bundle id), download `GoogleService-Info.plist`.
+4) Run:
+```
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
+
+### iOS/Android platform notes
+- iOS: add camera/photos usage descriptions in `Info.plist`.
+- Android: ensure `minSdkVersion` meets package requirements; add camera/storage permissions in `AndroidManifest.xml`.
+
+---
+
+## Running the App
+```
+flutter run
+```
+Common scripts to add later:
+```
+flutter format .
+flutter analyze
+flutter test
+```
+
+---
+
+## UX Notes and Editing Principles
+- Make edit tools discoverable and undoable (undo/redo + Reset).
+- Always preserve originals unless user chooses overwrite.
+- Show non-blocking upload progress; allow background/queued uploads.
+- Prefer thumbnails for grid performance; lazy load full images.
+- Be clear on destructive actions (confirmations for delete/overwrite).
+
+---
+
+## Roadmap
+- Phase 1: Auth, Gallery, Import/Capture, Editor (crop/rotate), Upload, Detail.
+- Phase 2: Filters/Adjustments, Offline queue, Thumbnails, Settings, Theming.
+- Phase 3: Search/Tags, Collections, Batch actions, Advanced editing tools.
+
+---
+
+## License
+MIT (or add your preferred license)
+
 # Welcome to your Lovable project
 
 ## Project info

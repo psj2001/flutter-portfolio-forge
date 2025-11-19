@@ -79,9 +79,11 @@ Follow these steps to add your first data to Firestore:
 
 ## Step 5: Add Experience (Subcollection)
 
+### To Add Your First Experience:
 1. Click on the `about` document
 2. Click **"Start collection"** → Collection ID: `experience`
-3. Add experience documents:
+3. Click **"Add document"** (use Auto-ID or set a custom ID)
+4. Add these fields:
 
 | Field | Type | Value |
 |-------|------|-------|
@@ -89,7 +91,19 @@ Follow these steps to add your first data to Firestore:
 | `company` | string | Company Name |
 | `period` | string | 2021 - Present |
 | `description` | string | Job description here |
+| `companyImage` or `companyimg` | string | URL to company logo/image (optional) |
 | `order` | number | 1 |
+
+5. Click **Save**
+
+### To Add More Experience Entries:
+1. Navigate to `portfolio` → `about` → `experience` (subcollection)
+2. Click **"+ Add document"**
+3. Fill in the fields as shown above
+4. Make sure to set the `order` field to control the display order (lower numbers appear first)
+5. Click **Save**
+
+**Note**: The `order` field is important - it determines the order in which experiences appear on your About page. Use sequential numbers (1, 2, 3...) for the order you want.
 
 ## Step 6: Add Projects
 
